@@ -9,7 +9,7 @@ import StoryLibraryPage from "./components/StoryLibraryPage";
 import SubscribePage from "./components/SubscribePage";
 import TopNav from "./components/TopNav";
 import { collectibleBadges, companions, storyUnits } from "./data/learningData";
-import { PageId, StoryStatus } from "./types";
+import { PageId, StoryStatus, StoryUnit } from "./types";
 
 function App() {
   const [activePage, setActivePage] = useState<PageId>("home");
@@ -23,20 +23,23 @@ function App() {
     [selectedCompanionId]
   );
 
-  const storiesWithProgress = useMemo(() => {
-    return storyUnits.map((story, index) => {
-      const isCompleted = completedStoryIds.includes(story.id);
-      const previousStoryCompleted = index === 0 || completedStoryIds.includes(storyUnits[index - 1].id);
-      return {
-  ...story,
-  status: (isCompleted
-    ? "completed"
-    : previousStoryCompleted
-    ? "current"
-    : "locked") as StoryStatus
-};
-    });
-  }, [completedStoryIds]);
+  const storiesWithProgress: StoryUnit[] = useMemo(() => {
+  return storyUnits.map((story, index) => {
+    const isCompleted = completedStoryIds.includes(story.id);
+    const previousStoryCompleted =
+      index === 0 ||
+      completedStoryIds.includes(storyUnits[index - 1].id);
+
+    return {
+      ...story,
+      status: isCompleted
+        ? "completed"
+        : previousStoryCompleted
+        ? "current"
+        : "locked",
+    } as StoryUnit;
+  });
+}, [completedStoryIds]);
 
   const selectedStory = useMemo(() => {
     return storiesWithProgress.find((story) => story.id === selectedStoryId) ?? storiesWithProgress[0];
